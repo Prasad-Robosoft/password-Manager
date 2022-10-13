@@ -22,7 +22,7 @@ exports.login = async(req,res)=>{
 
             
     } catch (error) {
-        res.send(error.statement)
+        res.status(401).send(error.statement)
     }
 }
 
@@ -65,10 +65,10 @@ exports.fogotPassword = async(req,res)=>{
         const response = await fast2sms.sendMessage(options).then((response)=>{
             console.log(response)
         }).catch((err)=>{
-            res.send(err.message)
+            res.status(401).send(err.message)
         })
         res.send(response)
     } catch (err) {
-        res.send(err.message)
+        res.status(401).send(err.message)
     }
 }
