@@ -1,7 +1,7 @@
 const userModel = require('../models/userModel')
 
 
-exports.signup = async(req,res)=>{
+exports.signup = async(req,res)=>{             //registering users using mobile number and 6 digit mpin
     try {
         
         await userModel.create({

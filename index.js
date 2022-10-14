@@ -20,9 +20,9 @@ mongoose.connect(mongo_url).then(()=>{
     console.log('sorry!! could not connect to database')
 }) 
 
+app.use(express.json())
 app.use(cors())
 app.use(helmet())
-app.use(express.json())
 app.use(userRouter)
 app.use(siteRouter)
 

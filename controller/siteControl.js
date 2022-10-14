@@ -1,7 +1,7 @@
 const siteSchema = require('../models/sitesModel')
 const encrypt = require('../utils/encrypt')
 
-exports.saveSites = async(req,res)=>{
+exports.saveSites = async(req,res)=>{                                          //creates sites which has to be saved
     try {
         await siteSchema.create({
             mobile:req.user.userMobile,
@@ -20,7 +20,7 @@ exports.saveSites = async(req,res)=>{
 }
 
 
-exports.getSites = async(req,res)=>{
+exports.getSites = async(req,res)=>{                                    //gets site details of a perticular user
     try {
         const page = req.query.page
         const limit = req.query.limit
@@ -41,7 +41,7 @@ exports.getSites = async(req,res)=>{
 }
 
 
-exports.filterSites = async(req,res)=>{
+exports.filterSites = async(req,res)=>{                                 //filters sites through social media
     try {
         response = await siteSchema.find({
             mobile: req.user.userMobile,
@@ -53,7 +53,7 @@ exports.filterSites = async(req,res)=>{
     }
 }
 
-exports.editSite = async(req,res)=>{
+exports.editSite = async(req,res)=>{                                   //edit details of sites and for passwords it gets encrypted
     try {
         found = await siteSchema.findByIdAndUpdate(req.body._id,{
             url: req.body.url,
@@ -69,3 +69,20 @@ exports.editSite = async(req,res)=>{
         res.status(401).send(error.message)
     }
 }
+
+exports.search = async(req,res)=>{                                     //search sites by notes sector and name
+    try {
+        results = await siteSchema.find({
+            $or: [
+                {notes:{$regex: req.body.text}},
+                {sector:{$regex: req.body.text}},
+                {name:{$regex: req.body.text}},
+            ]
+        })
+        res.send(results)
+    } catch (error) {
+        res.send(401).send(error.message)
+    }
+}
+
+

@@ -5,22 +5,27 @@ require('dotenv').config()
 const fast2sms = require('fast-two-sms')
 const jwt = require('jsonwebtoken')
 
-exports.login = async(req,res)=>{
+exports.login = async(req,res)=>{               // login using jwt token signing in with jwt
     try {
         const userMobile = {userMobile:req.body.mobile}
-
+        
         const findUser = await userModel.findOne({
             mobile: req.body.mobile
         })
         
         const result = await bcrypt.compare(req.body.mpin,findUser.mpin)
-        
-            const accessToken = jwt.sign(userMobile,process.env.ACCESS_TOKEN_SECRET,{expiresIn:'5h'})
+
+        if(result)
+        {
+            const accessToken = jwt.sign(userMobile,process.env.ACCESS_TOKEN_SECRET,{expiresIn:'30d'})
+            console.log(accessToken)
             res.json({
-                message: `Signin success!! ${req.user.userMobile}`,
+                message: "Signin Success !!",
                 token: accessToken
             })
-
+        }else{
+            res.send("account cannot be created")
+        }
             
     } catch (error) {
         res.status(401).send(error.statement)
@@ -51,7 +56,7 @@ exports.fogotPassword = async(req,res)=>{
                 res.send(error.message)
             }
             */
-    try {
+    try {                                                   //otp generation using fast2sms
 
         const otp = otpGen.generate(6,{upperCaseAlphabets: false, specialChars: false,lowerCaseAlphabets: false})
         mobile = req.body.mobile
