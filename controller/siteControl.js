@@ -55,14 +55,15 @@ exports.filterSites = async(req,res)=>{
 
 exports.editSite = async(req,res)=>{
     try {
-        found = await siteSchema.findOne({
-            mobile: req.user.userMobile,
+        found = await siteSchema.findByIdAndUpdate(req.body._id,{
+            url: req.body.url,
+            name: req.body.name,
+            sector:req.body.sector,
             userName: req.body.userName,
-            name: req.body.name
-        }).updateOne({
-            password: encrypt(req.body.password)
+            password: encrypt(req.body.password),
+            notes: req.body.notes
         })
-        
+        console.log(found)
         res.send("updated Successfully!!")
     } catch (error) {
         res.status(401).send(error.message)

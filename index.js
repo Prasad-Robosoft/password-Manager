@@ -1,10 +1,11 @@
 const express = require('express')
 const app = express()
 require('dotenv').config()
-
+const cors = require('cors')
 const mongoose = require('mongoose')
 const userRouter = require('./routes/UserRoutes')
 const siteRouter = require('./routes/siteRoutes')
+const helmet = require('helmet')
 
 port = process.env.PORT
 mongo_url = process.env.MONGO_URL
@@ -19,6 +20,8 @@ mongoose.connect(mongo_url).then(()=>{
     console.log('sorry!! could not connect to database')
 }) 
 
+app.use(cors())
+app.use(helmet())
 app.use(express.json())
 app.use(userRouter)
 app.use(siteRouter)

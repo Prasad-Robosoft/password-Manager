@@ -9,21 +9,17 @@ const siteSchema = mongoose.Schema({
     name:String,
     sector:String,
     password:String,
-    notes:String
+    notes:String,
+    updatedOn : {
+        type: Date,
+        default: Date.now()
+    }
 })
 
  
 siteSchema.pre('save',async function(next){
-    const crypt = new cryptr(process.env.SECRET_KEY)
-    const encryptedString = crypt.encrypt(this.password)
-    this.password = encryptedString
-    next()
-})
-
-siteSchema.pre('findOneAndUpdate',async function(next){
     const encryptedString = encrypt(this.password)
     this.password = encryptedString
-    console.log(this)
     next()
 })
 
