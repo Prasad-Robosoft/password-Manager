@@ -4,6 +4,7 @@ const otpGen = require('otp-generator')
 require('dotenv').config()
 const fast2sms = require('fast-two-sms')
 const jwt = require('jsonwebtoken')
+
 exports.login = async(req,res)=>{
     try {
         const userMobile = {userMobile:req.body.mobile}
@@ -16,7 +17,7 @@ exports.login = async(req,res)=>{
         
             const accessToken = jwt.sign(userMobile,process.env.ACCESS_TOKEN_SECRET,{expiresIn:'5h'})
             res.json({
-                message: "Signin success!! ${req.user.userMobile}",
+                message: `Signin success!! ${req.user.userMobile}`,
                 token: accessToken
             })
 

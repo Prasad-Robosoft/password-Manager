@@ -7,6 +7,6 @@ const authenticate = require('../middlewares/access')
 router.route('/saveSites').post(authenticate,saveSites)
 router.route('/getSites').get(authenticate,getSites)
 router.route('/filterSites').post(authenticate,filterSites)
-router.route('/editSite').post(authenticate,editSite)
+router.route('/editSite').put(authenticate,editSite)
 
 module.exports = router

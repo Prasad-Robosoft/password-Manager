@@ -1,5 +1,6 @@
 const mongoose = require('mongoose')
 const cryptr = require('cryptr')
+const encrypt = require('../utils/encrypt')
 
 const siteSchema = mongoose.Schema({
     mobile: String,
@@ -18,5 +19,13 @@ siteSchema.pre('save',async function(next){
     this.password = encryptedString
     next()
 })
+
+siteSchema.pre('findOneAndUpdate',async function(next){
+    const encryptedString = encrypt(this.password)
+    this.password = encryptedString
+    console.log(this)
+    next()
+})
+
 
 module.exports = mongoose.model('siteDetails',siteSchema)

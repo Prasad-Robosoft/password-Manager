@@ -1,4 +1,5 @@
 const siteSchema = require('../models/sitesModel')
+const encrypt = require('../utils/encrypt')
 
 exports.saveSites = async(req,res)=>{
     try {
@@ -21,9 +22,18 @@ exports.saveSites = async(req,res)=>{
 
 exports.getSites = async(req,res)=>{
     try {
-        details= await siteSchema.find({
+        const page = req.query.page
+        const limit = req.query.limit
+
+        siteCounts = await siteSchema.countDocuments({
             mobile: req.user.userMobile
         })
+        
+        details= await siteSchema.find({
+            mobile: req.user.userMobile
+        }).limit(limit).skip((page-1)*limit)
+
+        console.log(page)
         res.send(details)
     } catch (error) {
         res.status(401).send(error.message)
@@ -34,7 +44,8 @@ exports.getSites = async(req,res)=>{
 exports.filterSites = async(req,res)=>{
     try {
         response = await siteSchema.find({
-            mobile: req.user.userMobile
+            mobile: req.user.userMobile,
+            sector: "social media"
         })
         res.send(response)
     } catch (error) {
@@ -44,17 +55,14 @@ exports.filterSites = async(req,res)=>{
 
 exports.editSite = async(req,res)=>{
     try {
-        response = await siteSchema.findOneAndUpdate({
+        found = await siteSchema.findOne({
             mobile: req.user.userMobile,
-            sector: "social media"
-        },{
-            url: req.body.url,
-            name: req.body.name,
-            sector:req.body.sector,
             userName: req.body.userName,
-            password: req.body.password,
-            notes: req.body.notes
+            name: req.body.name
+        }).updateOne({
+            password: encrypt(req.body.password)
         })
+        
         res.send("updated Successfully!!")
     } catch (error) {
         res.status(401).send(error.message)
