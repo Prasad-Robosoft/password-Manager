@@ -10,7 +10,7 @@ exports.signup = async(req,res)=>{             //registering users using mobile 
         })
         res.send("signup success !!")
     } catch (error) {
-        res.status(401).send(error.message)
+        res.status(400).send(error.message)
     }
 }
 

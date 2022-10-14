@@ -6,6 +6,8 @@ const mongoose = require('mongoose')
 const userRouter = require('./routes/UserRoutes')
 const siteRouter = require('./routes/siteRoutes')
 const helmet = require('helmet')
+const rateLimit = require("express-rate-limit");
+const Api = require('twilio/lib/rest/Api')
 
 port = process.env.PORT
 mongo_url = process.env.MONGO_URL
@@ -13,6 +15,14 @@ mongo_url = process.env.MONGO_URL
 app.listen(port,()=>{
     console.log(`running on port ${port}`)
 })
+
+const limiter = rateLimit({
+    max: 200,
+    windowMs: 60 * 60 * 1000,
+    message: "Too many request from this IP",
+    standardHeaders: true, 
+	legacyHeaders: false,
+});
 
 mongoose.connect(mongo_url).then(()=>{
     console.log('connected to password manager database')
@@ -23,7 +33,8 @@ mongoose.connect(mongo_url).then(()=>{
 app.use(express.json())
 app.use(cors())
 app.use(helmet())
-app.use(userRouter)
-app.use(siteRouter)
+app.use(limiter)
+app.use('/api/v1',userRouter)
+app.use('/api/v1',siteRouter)
 
 module.exports = app

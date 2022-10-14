@@ -19,7 +19,6 @@ exports.login = async(req,res)=>{               // login using jwt token signing
         if(result)
         {
             const accessToken = jwt.sign(userMobile,process.env.ACCESS_TOKEN_SECRET,{expiresIn:'30d'})
-            console.log(accessToken)
             res.json({
                 message: "Signin Success !!",
                 token: accessToken
@@ -29,7 +28,7 @@ exports.login = async(req,res)=>{               // login using jwt token signing
         }
             
     } catch (error) {
-        res.status(401).send(error.statement)
+        res.status(400).send(error.statement)
     }
 }
 
@@ -54,7 +53,7 @@ exports.sendOtp = async(req,res)=>{
         })
         res.send(response)
     } catch (err) {
-        res.status(401).send(err.message)
+        res.status(400).send(err.message)
     }
 
     
@@ -113,7 +112,7 @@ exports.sendOtp = async(req,res)=>{
             */
 }
 
-exports.forgotPassword = async(req,res)=>{
+exports.forgotPassword = async(req,res)=>{                  //hash the password and update to db
     try {
         console.log(req.body.mpin)
         hashedPassword = await bcrypt.hash(req.body.mpin,10)

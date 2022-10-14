@@ -15,7 +15,7 @@ exports.saveSites = async(req,res)=>{                                          /
      
         res.send("password successfully saved!!")
     } catch (error) {
-        res.status(401).send(error.message)
+        res.status(400).send(error.message)
     }
 }
 
@@ -36,7 +36,7 @@ exports.getSites = async(req,res)=>{                                    //gets s
         console.log(page)
         res.send(details)
     } catch (error) {
-        res.status(401).send(error.message)
+        res.status(400).send(error.message)
     }
 }
 
@@ -49,7 +49,7 @@ exports.filterSites = async(req,res)=>{                                 //filter
         })
         res.send(response)
     } catch (error) {
-        res.status(401).send(error.message)
+        res.status(400).send(error.message)
     }
 }
 
@@ -66,7 +66,7 @@ exports.editSite = async(req,res)=>{                                   //edit de
         console.log(found)
         res.send("updated Successfully!!")
     } catch (error) {
-        res.status(401).send(error.message)
+        res.status(400).send(error.message)
     }
 }
 
@@ -81,7 +81,7 @@ exports.search = async(req,res)=>{                                     //search 
         })
         res.send(results)
     } catch (error) {
-        res.send(401).send(error.message)
+        res.send(400).send(error.message)
     }
 }
 
