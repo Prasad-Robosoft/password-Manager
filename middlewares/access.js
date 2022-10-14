@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken')
 
-function authenticate(req,res,next){
+function authenticate(req,res,next){                    //checking jwt token in headers and verifying the token
         const authHeader = req.headers['authorization']
         const token = authHeader && authHeader.split(' ')[1]
         if(token==null) return res.send('please add auth header')

@@ -31,7 +31,7 @@ exports.getSites = async(req,res)=>{                                    //gets s
         
         details= await siteSchema.find({
             mobile: req.user.userMobile
-        }).limit(limit).skip((page-1)*limit)
+        }).limit(limit).skip((page-1)*limit)                                   //pagination
 
         console.log(page)
         res.send(details)
