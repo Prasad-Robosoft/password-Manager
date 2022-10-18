@@ -45,7 +45,7 @@ exports.filterSites = async(req,res)=>{                                 //filter
     try {
         response = await siteSchema.find({
             mobile: req.user.userMobile,
-            sector: "social media"
+            sector: `${req.body.sector}`
         })
         res.send(response)
     } catch (error) {
@@ -73,12 +73,15 @@ exports.editSite = async(req,res)=>{                                   //edit de
 exports.search = async(req,res)=>{                                     //search sites by notes sector and name
     try {
         results = await siteSchema.find({
+            mobile: req.user.userMobile
+        }).find({
             $or: [
                 {notes:{$regex: req.body.text}},
                 {sector:{$regex: req.body.text}},
                 {name:{$regex: req.body.text}},
             ]
         })
+
         res.send(results)
     } catch (error) {
         res.send(400).send(error.message)
