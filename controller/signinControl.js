@@ -5,6 +5,8 @@ require('dotenv').config()
 const fast2sms = require('fast-two-sms')
 const jwt = require('jsonwebtoken')
 const nodemailer = require('nodemailer')
+const refreshModel = require('../models/refreshModel')
+const axios = require('axios')
 
 exports.login = async(req,res)=>{               // login using jwt token signing in with jwt
     try {
@@ -18,10 +20,13 @@ exports.login = async(req,res)=>{               // login using jwt token signing
 
         if(result)
         {
-            const accessToken = jwt.sign(userMobile,process.env.ACCESS_TOKEN_SECRET,{expiresIn:'30d'})
+            const accessToken = await axios.post('http://localhost:3000/api/v1/getRefresh',{
+                mobile: req.body.mobile
+            })
+
             res.json({
                 message: "Signin Success !!",
-                token: accessToken
+                token: accessToken.data
             })
         }else{
             res.send("account cannot be created")
@@ -56,60 +61,6 @@ exports.sendOtp = async(req,res)=>{
         res.status(400).send(err.message)
     }
 
-    
-    // const otp = otpGen.generate(6,{upperCaseAlphabets: false, specialChars: false,lowerCaseAlphabets: false})            //using nodemaier
-
-    // const options = {
-    //     from: "prasadrobosoft@gmail.com",
-    //     to: "vbhat.prasad@gmail.com",
-    //     subject:"check your otp for password manager",
-    //     text: `${otp}`
-    // }
-
-    // const transporter = nodemailer.createTransport({
-    //     service:"zohomail",
-    //     auth: {
-    //         user: "prasadrobosoft@gmail.com",
-    //         pass: ""
-    //     },
-    //     port:465,
-    //     host:"smtp.zoho.in",
-    //     secure:true
-    // })
-
-    // await transporter.sendMail(options,(err,info)=>{
-    //     if(err)
-    //     {
-    //         res.send(err)
-    //     }else{
-    //         res.send(info)
-    //     }
-    // })
-
-
-     /*
-            try {                                                           //OTP USING TWILLIO
-                accountSid = process.env.ACCOUNT_SID
-                authToken = process.env.AUTH_TOKEN      
-                mobile = req.body.mobile
-                const otp = otpGen.generate(6,{upperCaseAlphabets: false, specialChars: false,lowerCaseAlphabets: false})
-                const twilio = require('twilio')(accountSid,authToken)
-                console.log(otp)
-                await twilio.messages.create({
-                    from:'+919481676348',
-                    to: `+916362754485`,
-                    body: `Your otp from Prasad's password manager is ${otp}`
-                }).then(message =>{
-                    res.send(message)
-                    console.log(message)
-                }).catch(error=>{
-                    console.log(error)
-                    res.send(error)
-                })
-            } catch (error) {
-                res.send(error.message)
-            }
-            */
 }
 
 exports.forgotPassword = async(req,res)=>{                  //hash the password and update to db
@@ -126,4 +77,67 @@ exports.forgotPassword = async(req,res)=>{                  //hash the password 
     } catch (error) {
         res.send(error.message)
     }
+}
+
+
+
+exports.getAccessToken = async(req,res)=>{
+    const userMobile = {userMobile: req.user.userMobile}
+
+    const created = await refreshModel.findOne({
+        mobile: req.user.userMobile
+    }).select('created')
+
+    const created_date = created.created
+    cur_date = new Date()
+
+    const expiry_date = created_date.setDate(created_date.getDate()+ parseInt(30))
+    cur_date  = cur_date.setDate(cur_date.getDate()+ parseInt(0))
+
+    if(cur_date<expiry_date)
+    {
+        access_token = jwt.sign(userMobile,process.env.ACCESS_TOKEN_SECRET,{expiresIn:'30m'})
+        res.json({
+            "access token": access_token
+        })
+    }
+    else{
+        
+        const deleted = await refreshModel.deleteOne({
+            mobile: req.user.userMobile
+        })
+        res.send('refresh token expired')
+    }
+    
+}
+
+
+exports.getRefresh = async(req,res)=>{
+   try {
+    const userMobile = {userMobile: req.body.mobile}
+
+    const found = await refreshModel.findOne({
+        mobile: req.body.mobile
+    })
+
+    if(!found)
+    {
+        refresh_token = jwt.sign(userMobile,process.env.ACCESS_TOKEN_SECRET,{expiresIn:'30d'})
+
+        await refreshModel.create({
+            mobile: req.body.mobile,
+            refresh_token: refresh_token
+        })
+
+        access_token = jwt.sign(userMobile,process.env.ACCESS_TOKEN_SECRET,{expiresIn:'30m'})
+
+        res.json({
+            "access token": access_token
+        })
+    }else{
+        res.send("refresh token is live")
+    }
+   } catch (error) {
+        res.send(error.message)
+   }
 }

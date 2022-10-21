@@ -5,7 +5,7 @@ const refreshSchema = mongoose.Schema({
     refresh_token: String,
     created: {
         type: Date,
-        default: Date.now()
+        default: new Date().toISOString()
     }
 })
 
