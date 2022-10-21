@@ -81,7 +81,7 @@ exports.forgotPassword = async(req,res)=>{                  //hash the password 
 
 
 
-exports.getAccessToken = async(req,res)=>{
+exports.getAccessToken = async(req,res)=>{                                          //get access token verifying it has expired or not
     const userMobile = {userMobile: req.user.userMobile}
 
     const created = await refreshModel.findOne({
@@ -112,7 +112,7 @@ exports.getAccessToken = async(req,res)=>{
 }
 
 
-exports.getRefresh = async(req,res)=>{
+exports.getRefresh = async(req,res)=>{                  //generates refresh token for the first login and saves into database and sends to user
    try {
     const userMobile = {userMobile: req.body.mobile}
 
