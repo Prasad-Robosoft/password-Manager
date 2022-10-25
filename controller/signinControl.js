@@ -82,9 +82,9 @@ exports.genOtp = async(req,res)=>{                  //generate otp
         res.send({
             "token": speakeasy.totp({
                 secret: req.body.secret,
-                encoding: "base32"
+                encoding: "base32",
+                step: 60
             }),
-            "remaining": (30-Math.floor((new Date().getTime()/1000.0 % 30)))
         })
 
     } catch (error) {
@@ -99,7 +99,8 @@ exports.verifyOtp = async(req,res)=>{              //verify if otp is valid or n
                 secret: req.body.secret,
                 encoding: "base32",
                 token: req.body.token,
-                window: 0
+                window: 0,
+                step: 60
             })
         })
     } catch (error) {
