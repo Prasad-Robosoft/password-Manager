@@ -46,6 +46,23 @@ exports.login = async(req,res)=>{               // login using jwt token signing
     }
 }
 
+
+exports.forgotPassword = async(req,res)=>{
+    try {
+        
+       hashed = await bcrypt.hash(req.body.mpin,10)
+         await userModel.findOneAndUpdate({
+            mobile:req.body.mobile
+         },{
+            mpin: hashed
+         })
+        res.send("password updated successfully !!")
+    } catch (error) {
+        res.send(error.message)
+    }
+}
+
+
 exports.sendOtp = async(req,res)=>{
    
     try {                                                   //otp generation using fast2sms
@@ -82,7 +99,6 @@ exports.getSecret = async(req,res)=>{                            //gererates sec
         res.send(error.message)
     }
 }
-
 
 
 exports.genOtp = async(req,res)=>{                  //generate otp
