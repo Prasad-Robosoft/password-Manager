@@ -7,7 +7,7 @@ const userRouter = require('./routes/UserRoutes')
 const siteRouter = require('./routes/siteRoutes')
 const helmet = require('helmet')
 const rateLimit = require("express-rate-limit");
-const Api = require('twilio/lib/rest/Api')
+
 
 port = process.env.PORT
 mongo_url = process.env.MONGO_URL

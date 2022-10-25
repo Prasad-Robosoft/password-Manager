@@ -17,21 +17,29 @@ exports.login = async(req,res)=>{               // login using jwt token signing
             mobile: req.body.mobile
         })
 
-        const result = await bcrypt.compare(req.body.mpin,findUser.mpin)
-
-        if(result)
+        if(findUser)
         {
-            const accessToken = await axios.post('http://localhost:3000/api/v1/getRefresh',{
-                mobile: req.body.mobile
-            })
+            const result = await bcrypt.compare(req.body.mpin,findUser.mpin)
 
-            res.json({
-                message: "Signin Success !!",
-                token: accessToken.data
-            })
+            if(result)
+            {
+                const accessToken = await axios.post('http://localhost:3000/api/v1/getRefresh',{
+                    mobile: req.body.mobile
+                })
+    
+                res.json({
+                    message: "Signin Success !!",
+                    token: accessToken.data
+                })
+            }else{
+                res.send("account cannot be created")
+            }
+
         }else{
-            res.send("account cannot be created")
+            res.send("user not registered")
         }
+
+      
             
     } catch (error) {
         res.status(400).send(error.statement)
@@ -84,7 +92,7 @@ exports.genOtp = async(req,res)=>{                  //generate otp
                 secret: req.body.secret,
                 encoding: "base32",
                 step: 60
-            }),
+            })
         })
 
     } catch (error) {
@@ -111,32 +119,36 @@ exports.verifyOtp = async(req,res)=>{              //verify if otp is valid or n
 
 
 exports.getAccessToken = async(req,res)=>{                                          //get access token verifying it has expired or not
-    const userMobile = {userMobile: req.user.userMobile}
+  try {
+        const userMobile = {userMobile: req.user.userMobile}
 
-    const created = await refreshModel.findOne({
-        mobile: req.user.userMobile
-    }).select('created')
-
-    const created_date = created.created
-    cur_date = new Date()
-
-    const expiry_date = created_date.setDate(created_date.getDate()+ parseInt(30))
-    cur_date  = cur_date.setDate(cur_date.getDate()+ parseInt(0))
-
-    if(cur_date<expiry_date)
-    {
-        access_token = jwt.sign(userMobile,process.env.ACCESS_TOKEN_SECRET,{expiresIn:'30m'})
-        res.json({
-            "access token": access_token
-        })
-    }
-    else{
-        
-        const deleted = await refreshModel.deleteOne({
+        const created = await refreshModel.findOne({
             mobile: req.user.userMobile
-        })
-        res.send('refresh token expired')
-    }
+        }).select('created')
+
+        const created_date = created.created
+        cur_date = new Date()
+
+        const expiry_date = created_date.setDate(created_date.getDate()+ parseInt(30))
+        cur_date  = cur_date.setDate(cur_date.getDate()+ parseInt(0))
+
+        if(cur_date<expiry_date)
+        {
+            access_token = jwt.sign(userMobile,process.env.ACCESS_TOKEN_SECRET,{expiresIn:'30m'})
+            res.json({
+                "access token": access_token
+            })
+        }
+        else{
+            
+            const deleted = await refreshModel.deleteOne({
+                mobile: req.user.userMobile
+            })
+            res.send('refresh token expired')
+        }
+  } catch (error) {
+    res.send(error.message)
+  }
     
 }
 

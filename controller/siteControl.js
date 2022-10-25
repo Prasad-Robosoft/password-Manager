@@ -43,9 +43,10 @@ exports.getSites = async(req,res)=>{                                    //gets s
 
 exports.filterSites = async(req,res)=>{                                 //filters sites through social media
     try {
+        const sector = req.body.sector
         response = await siteSchema.find({
             mobile: req.user.userMobile,
-            sector: "social media"
+            sector: `${sector}`
         })
         res.send(response)
     } catch (error) {
@@ -54,7 +55,7 @@ exports.filterSites = async(req,res)=>{                                 //filter
 }
 
 exports.editSite = async(req,res)=>{                                   //edit details of sites and for passwords it gets encrypted
-    try {
+    try {   
         found = await siteSchema.findByIdAndUpdate(req.body._id,{
             url: req.body.url,
             name: req.body.name,
@@ -72,7 +73,9 @@ exports.editSite = async(req,res)=>{                                   //edit de
 
 exports.search = async(req,res)=>{                                     //search sites by notes sector and name
     try {
-        results = await siteSchema.find({
+        const results = await siteSchema.findOne({
+            mobile: req.user.userMobile
+        }).find({
             $or: [
                 {notes:{$regex: req.body.text}},
                 {sector:{$regex: req.body.text}},
