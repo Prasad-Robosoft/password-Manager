@@ -30,6 +30,7 @@ mongoose.connect(mongo_url).then(()=>{              //mongodb connection
     console.log('sorry!! could not connect to database')
 }) 
 
+//all middlewares
 app.use(express.json())
 app.use(cors())
 app.use(helmet())
