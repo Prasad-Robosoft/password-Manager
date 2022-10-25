@@ -7,6 +7,7 @@ const jwt = require('jsonwebtoken')
 const nodemailer = require('nodemailer')
 const refreshModel = require('../models/refreshModel')
 const axios = require('axios')
+const speakeasy = require('speakeasy')
 
 exports.login = async(req,res)=>{               // login using jwt token signing in with jwt
     try {
@@ -63,17 +64,44 @@ exports.sendOtp = async(req,res)=>{
 
 }
 
-exports.forgotPassword = async(req,res)=>{                  //hash the password and update to db
+exports.getSecret = async(req,res)=>{                            //gererates secret key which will be saved in database in production
     try {
-        console.log(req.body.mpin)
-        hashedPassword = await bcrypt.hash(req.body.mpin,10)
-
-        await userModel.findOneAndUpdate({
-            mobile:req.body.mobile
-        },{
-            mpin: hashedPassword
+        const secret = speakeasy.generateSecret({length: 10})
+        res.send({
+            "secret": secret.base32
         })
-        res.send("Password successfully updated")
+    } catch (error) {
+        res.send(error.message)
+    }
+}
+
+
+
+exports.genOtp = async(req,res)=>{                  //generate otp
+    try {
+        res.send({
+            "token": speakeasy.totp({
+                secret: req.body.secret,
+                encoding: "base32"
+            }),
+            "remaining": (30-Math.floor((new Date().getTime()/1000.0 % 30)))
+        })
+
+    } catch (error) {
+        res.send(error.message)
+    }
+}
+
+exports.verifyOtp = async(req,res)=>{              //verify if otp is valid or not
+    try {
+        res.send({
+            "valid": speakeasy.totp.verify({
+                secret: req.body.secret,
+                encoding: "base32",
+                token: req.body.token,
+                window: 0
+            })
+        })
     } catch (error) {
         res.send(error.message)
     }
